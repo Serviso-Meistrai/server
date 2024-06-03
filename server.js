@@ -13,6 +13,12 @@ app.use(cors());
 app.options('*');
 app.use(express.urlencoded({ extended: false }));
 
+app.use('/api/users', require("./routes/userRoutes"));
+app.use('/api/likes', require("./routes/likesRoutes"));
+app.use('/api/ads', require("./routes/adRoutes"));
+
+app.use(errorHandler);
+
 app.listen(process.env.PORT, () =>
   console.log(`Server is running on port ${process.env.PORT}`)
 );
