@@ -1,5 +1,6 @@
 const Ad = require('../models/adModel');
 const Likes = require('../models/likesModel');
+const Service = require('../models/serviceModel');
 const asyncHandler = require("express-async-handler");
 
 // Controller function to create an ad
@@ -11,13 +12,19 @@ const createAd = asyncHandler(async (req, res) => {
     return res.status(400).json({ error: 'All fields are required.' });
   }
 
+  const serviceObj = await Service.findOne({ name: serviceName });
+
+  if (!serviceObj) {
+    return res.status(400).json({ error: 'Service not found' });
+  }
+
   // Create a new ad document
   const newAd = new Ad({
     name,
     surname,
     specialization,
     img,
-    serviceName,
+    serviceName: serviceObj._id,
     city,
     user: req.user._id,
   });
@@ -31,14 +38,14 @@ const createAd = asyncHandler(async (req, res) => {
 
 // Controller function to get all ads
 const getAllAds = asyncHandler(async (req, res) => {
-  const ads = await Ad.find().populate('user').populate('likes');
+  const ads = await Ad.find().populate('user').populate('likes').populate('serviceName');
   res.status(200).json(ads);
 });
 
 // Controller function to get ads by user
 const getUserAds = asyncHandler(async (req, res) => {
   const userId = req.user._id; // Get the authenticated user's ID
-  const userAds = await Ad.find({ user: userId }).populate('user').populate('likes');
+  const userAds = await Ad.find({ user: userId }).populate('user').populate('likes').populate('serviceName');
   res.status(200).json(userAds);
 });
 
@@ -51,6 +58,12 @@ const updateAd = asyncHandler(async (req, res) => {
   // Validate input
   if (!name || !surname || !specialization || !img || !serviceName || !city) {
     return res.status(400).json({ error: 'All fields are required.' });
+  }
+
+  const serviceObj = await Service.findOne({ name: serviceName });
+
+  if (!serviceObj) {
+    return res.status(400).json({ error: 'Service not found' });
   }
 
   // Find the ad by id and user id
@@ -66,7 +79,7 @@ const updateAd = asyncHandler(async (req, res) => {
     surname,
     specialization,
     img,
-    serviceName,
+    serviceName: serviceObj._id,
     city
   }, { new: true }); // Set { new: true } to return the updated document
 

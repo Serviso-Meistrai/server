@@ -1,11 +1,12 @@
 const express = require('express');
 const { createAd, getAllAds, getUserAds, updateAd, deleteAd } = require('../controllers/adController');
 const { protect } = require("../middleware/authMiddleware");
+const protectAdmin = require("../middleware/adminAuthMiddleware");
 
 const router = express.Router();
 
 // Route to create an ad
-router.post('/', protect, createAd);
+router.post('/', protectAdmin, createAd);
 
 // Route to get all ads
 router.get('/', getAllAds);
