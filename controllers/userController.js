@@ -18,7 +18,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
   if (userExist) {
     res.status(400);
-    throw new Error("User already exist");
+    throw new Error("User already exists");
   }
 
   const salt = await bcrypt.genSalt(10);
@@ -72,7 +72,27 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 });
 
+// Get user by ID
+// @route GET /api/users/:id
+// @access PRIVATE
+const getUserById = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+
+  if (user) {
+    res.json({
+      _id: user.id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+    });
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
+});
+
 module.exports = {
-    registerUser,
-    loginUser,
-  };
+  registerUser,
+  loginUser,
+  getUserById,
+};
