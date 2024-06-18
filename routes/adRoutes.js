@@ -1,7 +1,13 @@
 const express = require('express');
-const { createAd, getAllAds, getUserAds, updateAd, deleteAd } = require('../controllers/adController');
-const { protect } = require("../middleware/authMiddleware");
-const protectAdmin = require("../middleware/adminAuthMiddleware");
+const {
+  createAd,
+  getAllAds,
+  getUserAds,
+  updateAd,
+  deleteAd,
+} = require('../controllers/adController');
+const { protect } = require('../middleware/authMiddleware');
+const protectAdmin = require('../middleware/adminAuthMiddleware');
 
 const router = express.Router();
 
@@ -15,9 +21,9 @@ router.get('/', getAllAds);
 router.get('/user', protect, getUserAds);
 
 // Route to update an ad by id
-router.put('/:id', protect, updateAd);
+router.put('/:id', protectAdmin, updateAd);
 
 // Route to delete an ad by id
-router.delete('/:id', protect, deleteAd);
+router.delete('/:id', protectAdmin, deleteAd);
 
 module.exports = router;
