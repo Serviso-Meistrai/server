@@ -18,6 +18,6 @@ router.get('/user', protect, getUserAds);
 router.put('/:id', protect, updateAd);
 
 // Route to delete an ad by id
-router.delete('/:id', protect, deleteAd);
+router.delete('/:id', protectAdmin, deleteAd);
 
 module.exports = router;
