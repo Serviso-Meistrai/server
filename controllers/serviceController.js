@@ -1,10 +1,8 @@
 const Service = require('../models/serviceModel');
-const Ad = require('../models/adModel'); 
+const Ad = require('../models/adModel');
 const asyncHandler = require('express-async-handler');
 
-// Create a new category
-// Route: POST /api/categories
-// Access: Private
+// Create a new service
 const createService = asyncHandler(async (req, res) => {
   const { name } = req.body;
 
@@ -30,35 +28,46 @@ const createService = asyncHandler(async (req, res) => {
   }
 });
 
-// Get all categories
-// Route: GET /api/categories
-// Access: Public
+// Get all services
 const getAllServices = asyncHandler(async (req, res) => {
-  const service = await Service.find();
-  res.json(service);
+  const services = await Service.find();
+  res.json(services);
 });
 
-// Delete category by ID
-// Route: DELETE /api/categories/:id
-// Access: Private (assuming only admin can delete a category)
-const deleteService = asyncHandler(async (req, res) => {
-    try {
-      const service = await Service.findById(req.params.id);
-  
-      if (!service) {
-        return res.status(404).json({ message: 'Service not found' });
-      }
-  
-      // Delete ads with the deleted service
-      await Ad.deleteMany({ serviceName: req.params.id });
-  
-      // Delete the service itself
-      await service.deleteOne();
-  
-      res.json({ message: 'Service and related ads removed' });
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  });
+// Update service by ID
+const updateService = asyncHandler(async (req, res) => {
+  const { name } = req.body;
+  const service = await Service.findById(req.params.id);
 
-module.exports = { createService, getAllServices, deleteService };
+  if (!service) {
+    res.status(404);
+    throw new Error('Service not found');
+  }
+
+  service.name = name || service.name;
+  const updatedService = await service.save();
+  res.json(updatedService);
+});
+
+// Delete service by ID
+const deleteService = asyncHandler(async (req, res) => {
+  try {
+    const service = await Service.findById(req.params.id);
+
+    if (!service) {
+      return res.status(404).json({ message: 'Service not found' });
+    }
+
+    // Delete ads with the deleted service
+    await Ad.deleteMany({ serviceName: req.params.id });
+
+    // Delete the service itself
+    await service.deleteOne();
+
+    res.json({ message: 'Service and related ads removed' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+module.exports = { createService, getAllServices, updateService, deleteService };
